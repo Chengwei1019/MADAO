@@ -167,6 +167,57 @@ export default function HomePage() {
     }
   }
 
+  async function handleCompleteTask(taskId: string) {
+    if (!profile) return;
+
+    const supabase = createSupabaseBrowserClient();
+    const { error: updateError } = await supabase
+      .from("daily_tasks")
+      .update({
+        status: "completed",
+        completed_at: new Date().toISOString(),
+      })
+      .eq("id", taskId)
+      .eq("user_id", profile.id);
+
+    if (updateError) {
+      setPlanError(updateError.message);
+      return;
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: existingCheckIn } = await supabase
+      .from("check_ins")
+      .select("id, completed_count")
+      .eq("user_id", profile.id)
+      .eq("check_date", today)
+      .maybeSingle();
+
+    const nextCompletedCount = Math.min(
+      tasks.length,
+      (existingCheckIn?.completed_count ?? 0) + 1,
+    );
+
+    if (existingCheckIn) {
+      await supabase
+        .from("check_ins")
+        .update({
+          completed_count: nextCompletedCount,
+          total_count: tasks.length,
+        })
+        .eq("id", existingCheckIn.id);
+    } else {
+      await supabase.from("check_ins").insert({
+        user_id: profile.id,
+        check_date: today,
+        completed_count: 1,
+        total_count: tasks.length,
+      });
+    }
+
+    await loadSessionAndProfile();
+  }
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-sm text-[#737a88]">
@@ -305,6 +356,15 @@ export default function HomePage() {
                 <span className="rounded-xl bg-[#f7f8fa] px-3 py-2 text-xs font-medium text-[#737a88]">
                   {task.status === "completed" ? "已完成" : "待完成"}
                 </span>
+                {task.status !== "completed" ? (
+                  <button
+                    type="button"
+                    onClick={() => handleCompleteTask(task.id)}
+                    className="rounded-xl bg-[#e9edff] px-4 py-2 text-xs font-semibold text-[#4f6df5] transition hover:bg-[#dde4ff]"
+                  >
+                    完成
+                  </button>
+                ) : null}
               </div>
             ))}
           </div>
