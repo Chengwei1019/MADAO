@@ -21,6 +21,12 @@ type DailyTask = {
   status: string;
 };
 
+type PlannedTaskView = {
+  task_type: string;
+  title: string;
+  estimated_minutes: number;
+};
+
 function remainingDays(target: string) {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -34,6 +40,8 @@ export default function HomePage() {
   const [email, setEmail] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tasks, setTasks] = useState<DailyTask[]>([]);
+  const [generating, setGenerating] = useState(false);
+  const [planError, setPlanError] = useState("");
 
   const loadSessionAndProfile = useCallback(async () => {
     const supabase = createSupabaseBrowserClient();
@@ -81,6 +89,82 @@ export default function HomePage() {
     setTasks([]);
     setUserId("");
     setEmail("");
+  }
+
+  async function handleGeneratePlan() {
+    if (!profile) return;
+
+    setGenerating(true);
+    setPlanError("");
+
+    try {
+      const response = await fetch("/api/daily-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          examDate: profile.exam_date,
+          level: profile.exam_type,
+          minutesAvailable: profile.daily_minutes,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.plan?.tasks?.length) {
+        throw new Error(data.error ?? "Failed to generate a plan.");
+      }
+
+      const supabase = createSupabaseBrowserClient();
+      const today = new Date().toISOString().slice(0, 10);
+      let planId = "";
+
+      const { data: planData, error: planInsertError } = await supabase
+        .from("daily_plans")
+        .insert({
+          user_id: profile.id,
+          plan_date: today,
+          total_minutes: data.plan.total_minutes,
+          status: "active",
+          generated_by: "deepseek",
+        })
+        .select("id")
+        .single();
+
+      if (planInsertError) {
+        if (planInsertError.code !== "23505") throw planInsertError;
+        const { data: existingPlan } = await supabase
+          .from("daily_plans")
+          .select("id")
+          .eq("user_id", profile.id)
+          .eq("plan_date", today)
+          .maybeSingle();
+        planId = existingPlan?.id ?? "";
+      } else {
+        planId = planData?.id ?? "";
+      }
+
+      if (!planId) throw new Error("Could not create the daily plan.");
+
+      const { error: tasksInsertError } = await supabase
+        .from("daily_tasks")
+        .insert(
+          data.plan.tasks.map((task: PlannedTaskView, index: number) => ({
+            plan_id: planId,
+            user_id: profile.id,
+            task_type: task.task_type,
+            title: task.title,
+            estimated_minutes: task.estimated_minutes,
+            status: "pending",
+            order_index: index,
+          })),
+        );
+
+      if (tasksInsertError) throw tasksInsertError;
+      await loadSessionAndProfile();
+    } catch (error) {
+      setPlanError(error instanceof Error ? error.message : "生成计划失败。");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   if (loading) {
@@ -229,8 +313,21 @@ export default function HomePage() {
             <div className="text-3xl">📋</div>
             <h3 className="mt-4 text-base font-semibold">今日计划尚未生成</h3>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#737a88]">
-              下一步会由 AI 根据你的考试日期和每日时间生成任务。当前先完成账户与目标设置。
+              AI 会根据你的考试日期和每日时间，自动安排今天要完成的单词、阅读、翻译等任务。
             </p>
+            <button
+              type="button"
+              disabled={generating}
+              onClick={handleGeneratePlan}
+              className="mt-6 rounded-2xl bg-[#4f6df5] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-60"
+            >
+              {generating ? "AI 正在编排今日任务..." : "让 AI 生成今日计划"}
+            </button>
+            {planError ? (
+              <p className="mx-auto mt-4 max-w-md rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                {planError}
+              </p>
+            ) : null}
           </div>
         )}
       </section>
