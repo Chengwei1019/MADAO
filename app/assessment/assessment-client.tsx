@@ -39,11 +39,11 @@ export function AssessmentClient() {
 
       const { data, error } = await supabase
         .from("words")
-        .select("id, word, meaning")
-        .limit(20);
+        .select("id, word, meaning");
 
       if (!error) {
-        setWords((data ?? []) as AssessmentWord[]);
+        const shuffled = [...(data ?? [])].sort(() => Math.random() - 0.5);
+        setWords(shuffled.slice(0, 20) as AssessmentWord[]);
       }
       setLoading(false);
     }

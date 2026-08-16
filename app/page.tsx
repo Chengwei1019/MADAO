@@ -212,11 +212,12 @@ export default function HomePage() {
 
   async function saveSettings() {
     if (!profile) return;
+    const minutes = Math.min(180, Math.max(5, draftMinutes));
     setSavingSettings(true);
     const supabase = createSupabaseBrowserClient();
     const { error } = await supabase
       .from("profiles")
-      .update({ daily_minutes: draftMinutes })
+      .update({ daily_minutes: minutes })
       .eq("id", profile.id);
     setSavingSettings(false);
     if (error) {
@@ -654,20 +655,33 @@ export default function HomePage() {
             <p className="mt-1 text-sm text-[var(--muted)]">
               调整每天想投入的学习时间，AI 会按这个时长排任务。
             </p>
-            <div className="mt-5 grid gap-2">
-              {[15, 30, 45, 60].map((minutes) => (
+            <div className="mt-5 flex items-center gap-3">
+              <input
+                type="number"
+                min={5}
+                max={180}
+                step={5}
+                value={draftMinutes}
+                onChange={(event) =>
+                  setDraftMinutes(Math.max(5, Number(event.target.value) || 5))
+                }
+                className="w-24 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-center text-lg font-semibold outline-none transition focus:border-[var(--brand)]"
+              />
+              <span className="text-sm text-[var(--muted)]">分钟 / 天</span>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {[15, 30, 45, 60, 90].map((minutes) => (
                 <button
                   key={minutes}
                   type="button"
                   onClick={() => setDraftMinutes(minutes)}
-                  className={`flex items-center justify-between rounded-xl border p-3 text-sm transition ${
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     draftMinutes === minutes
-                      ? "border-[var(--brand)] bg-[var(--brand-soft)] font-semibold text-[#4f6df5]"
-                      : "border-[var(--line)] bg-[var(--card)] text-[var(--muted)]"
+                      ? "border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand)]"
+                      : "border-[var(--line)] text-[var(--muted)] hover:bg-[var(--surface)]"
                   }`}
                 >
-                  <span>{minutes} 分钟</span>
-                  {draftMinutes === minutes ? <span>✓</span> : null}
+                  {minutes} 分钟
                 </button>
               ))}
             </div>

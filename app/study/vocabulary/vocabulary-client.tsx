@@ -21,11 +21,11 @@ export function VocabularyClient() {
       const supabase = createSupabaseBrowserClient();
       const { data, error } = await supabase
         .from("words")
-        .select("id, word, phonetic, meaning, example")
-        .limit(10);
+        .select("id, word, phonetic, meaning, example");
 
       if (!error) {
-        setWords(data ?? []);
+        const shuffled = [...(data ?? [])].sort(() => Math.random() - 0.5);
+        setWords(shuffled.slice(0, 10));
       }
       setLoading(false);
     }

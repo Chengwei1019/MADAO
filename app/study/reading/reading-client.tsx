@@ -32,16 +32,18 @@ export function ReadingClient() {
   useEffect(() => {
     async function load() {
       const supabase = createSupabaseBrowserClient();
-      const { data: passageData, error: passageError } = await supabase
+      const { data: passages, error: passageError } = await supabase
         .from("passages")
-        .select("id, title, content")
-        .limit(1)
-        .maybeSingle();
+        .select("id, title, content");
 
-      if (passageError || !passageData) {
+      if (passageError || !passages || passages.length === 0) {
         setLoading(false);
         return;
       }
+
+      const passageData = passages[
+        Math.floor(Math.random() * passages.length)
+      ] as { id: string; title: string; content: string };
 
       const { data: questionData } = await supabase
         .from("questions")
