@@ -66,12 +66,25 @@ export function ReadingClient() {
     void load();
   }, []);
 
-  async function handleFinish() {
+  async function handleFinish(
+    _correctCount: number,
+    _totalCount: number,
+    wrongAnswers: { questionId: string; chosenIndex: number }[],
+  ) {
+    const supabase = createSupabaseBrowserClient();
+    if (userId && wrongAnswers.length > 0) {
+      await supabase.from("wrong_answers").insert(
+        wrongAnswers.map((wrong) => ({
+          user_id: userId,
+          question_id: wrong.questionId,
+          chosen_index: wrong.chosenIndex,
+        })),
+      );
+    }
     if (!userId || !taskId) {
       router.push("/");
       return;
     }
-    const supabase = createSupabaseBrowserClient();
     await supabase
       .from("daily_tasks")
       .update({

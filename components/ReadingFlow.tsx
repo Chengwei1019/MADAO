@@ -19,7 +19,11 @@ export type ReadingPassage = {
 
 type ReadingFlowProps = {
   passage: ReadingPassage;
-  onFinish: (correctCount: number, totalCount: number) => void;
+  onFinish: (
+    correctCount: number,
+    totalCount: number,
+    wrongAnswers: { questionId: string; chosenIndex: number }[],
+  ) => void;
   onExit: () => void;
 };
 
@@ -45,7 +49,13 @@ export function ReadingFlow({
     const correct = passage.questions.filter(
       (q) => answers[q.id] === q.correct_index,
     ).length;
-    onFinish(correct, total);
+    const wrong = passage.questions
+      .filter((q) => answers[q.id] !== q.correct_index)
+      .map((q) => ({
+        questionId: q.id,
+        chosenIndex: answers[q.id],
+      }));
+    onFinish(correct, total, wrong);
   }
 
   return (

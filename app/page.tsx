@@ -6,6 +6,7 @@ import { OnboardingPanel } from "@/components/OnboardingPanel";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ShareCardModal } from "@/components/ShareCardModal";
 
 type Profile = {
   id: string;
@@ -116,6 +117,7 @@ export default function HomePage() {
   const [showSettings, setShowSettings] = useState(false);
   const [draftMinutes, setDraftMinutes] = useState(30);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   const loadSessionAndProfile = useCallback(async () => {
     const supabase = createSupabaseBrowserClient();
@@ -508,11 +510,24 @@ export default function HomePage() {
           <p className="mt-5 text-sm leading-6 text-[var(--muted)]">
             每完成一项任务，都会离你的考试目标更近一步。
           </p>
+          <button
+            type="button"
+            onClick={() => setShowShare(true)}
+            className="mt-4 w-full rounded-xl border border-[var(--line)] px-4 py-2 text-xs font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
+          >
+            生成分享卡片
+          </button>
           <div className="mt-5 border-t border-[#eef0f4] pt-4">
             <div className="mb-2 text-xs text-[var(--muted)]">最近 14 周打卡</div>
             <div className="grid grid-flow-col grid-rows-7 gap-1">
               {buildHeatmap(checkIns)}
             </div>
+            <Link
+              href="/review/calendar"
+              className="mt-3 block text-center text-xs font-medium text-[var(--brand)] transition hover:opacity-80"
+            >
+              查看完整学习日历 →
+            </Link>
           </div>
         </article>
       </section>
@@ -615,6 +630,23 @@ export default function HomePage() {
         </Link>
       </section>
 
+      <section className="mt-6">
+        <Link
+          href="/review/wrong-answers"
+          className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 transition hover:border-[var(--brand)]"
+        >
+          <span>
+            <span className="block text-sm font-semibold">错题本</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">
+              阅读做错的题目会自动收录到这里
+            </span>
+          </span>
+          <span className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[var(--brand)]">
+            查看
+          </span>
+        </Link>
+      </section>
+
       {showSettings ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5">
           <div className="w-full max-w-sm rounded-[24px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_20px_60px_rgba(30,35,55,0.18)]">
@@ -658,6 +690,20 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      ) : null}
+
+      {showShare ? (
+        <ShareCardModal
+          data={{
+            streakDays,
+            todayCompleted: completedCount,
+            todayTotal: tasks.length,
+            examLabel,
+            daysLeft,
+            vocabularyLevel: assessment?.level ?? "未测评",
+          }}
+          onClose={() => setShowShare(false)}
+        />
       ) : null}
     </main>
   );
