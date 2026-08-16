@@ -88,6 +88,16 @@ function buildHeatmap(checkDates: string[]) {
   return cells;
 }
 
+function isBrokenStreak(checkDates: string[]) {
+  if (checkDates.length === 0) return false;
+  const dateSet = new Set(checkDates);
+  const yesterday = new Date();
+  yesterday.setHours(0, 0, 0, 0);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = localDateString(yesterday);
+  return !dateSet.has(yesterdayKey);
+}
+
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
@@ -99,6 +109,7 @@ export default function HomePage() {
     vocabulary_score: number;
   } | null>(null);
   const [checkIns, setCheckIns] = useState<string[]>([]);
+  const [brokenStreak, setBrokenStreak] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [planError, setPlanError] = useState("");
 
@@ -162,6 +173,13 @@ export default function HomePage() {
         .gte("check_date", localDateString(since));
       setCheckIns(
         (checkInData ?? []).map((row: { check_date: string }) => row.check_date),
+      );
+      setBrokenStreak(
+        isBrokenStreak(
+          (checkInData ?? []).map(
+            (row: { check_date: string }) => row.check_date,
+          ),
+        ),
       );
     }
 
@@ -387,6 +405,20 @@ export default function HomePage() {
           {profile.username} · 退出
         </button>
       </header>
+
+      {brokenStreak ? (
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+          <span className="text-xl">⚠️</span>
+          <div className="flex-1">
+            <div className="text-sm font-semibold text-amber-800">
+              昨天的学习中断了
+            </div>
+            <div className="mt-0.5 text-xs text-amber-700">
+              连续记录已经重置，今天重新开始，别让状态溜走。
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <section className="mt-9 grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
         <article className="rounded-[28px] border border-[#e4e7ed] bg-white p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
