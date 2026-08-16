@@ -648,6 +648,23 @@ export default function HomePage() {
         </Link>
       </section>
 
+      <section className="mt-6">
+        <Link
+          href="/review/favorites"
+          className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 transition hover:border-[var(--brand)]"
+        >
+          <span>
+            <span className="block text-sm font-semibold">收藏夹</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">
+              收藏的单词、例句、翻译原句和作文题目
+            </span>
+          </span>
+          <span className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[var(--brand)]">
+            查看
+          </span>
+        </Link>
+      </section>
+
       {showSettings ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5">
           <div className="w-full max-w-sm rounded-[24px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_20px_60px_rgba(30,35,55,0.18)]">

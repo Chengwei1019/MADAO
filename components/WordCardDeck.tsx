@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FavoriteStar } from "@/components/FavoriteStar";
 
 export type WordCard = {
   id: string;
@@ -99,8 +100,16 @@ export function WordCardDeck({
       </div>
 
       <div className="mt-8 flex min-h-[320px] w-full flex-col items-center justify-center rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-10 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
-        <div className="text-4xl font-semibold tracking-tight">
-          {current.word}
+        <div className="flex items-center gap-3">
+          <div className="text-4xl font-semibold tracking-tight">
+            {current.word}
+          </div>
+          <FavoriteStar
+            itemType="word"
+            content={current.word}
+            extra={{ meaning: current.meaning }}
+            className="text-[var(--muted)]"
+          />
         </div>
         <div className="mt-2 text-sm text-[var(--muted)]">{current.phonetic}</div>
 
@@ -110,7 +119,15 @@ export function WordCardDeck({
               {current.meaning}
             </div>
             <div className="mt-4 rounded-2xl bg-[var(--surface)] px-5 py-4 text-left text-sm leading-7 text-[var(--muted)]">
-              {current.example}
+              <div className="flex items-start justify-between gap-3">
+                <span>{current.example}</span>
+                <FavoriteStar
+                  itemType="sentence"
+                  content={current.example}
+                  extra={{ source: current.word }}
+                  className="shrink-0 text-[var(--muted)]"
+                />
+              </div>
             </div>
           </div>
         ) : (

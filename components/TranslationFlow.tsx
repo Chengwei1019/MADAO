@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FavoriteStar } from "@/components/FavoriteStar";
 
 type TranslationFlowProps = {
   sourceText: string;
@@ -32,8 +33,16 @@ export function TranslationFlow({
       </div>
 
       <article className="rounded-[24px] border border-[var(--line)] bg-[var(--card)] p-8 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
-        <div className="text-sm font-medium tracking-wide text-[#4f6df5]">
-          原文
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium tracking-wide text-[#4f6df5]">
+            原文
+          </div>
+          <FavoriteStar
+            itemType="translation"
+            content={sourceText}
+            extra={{ reference: referenceText }}
+            className="text-[var(--muted)]"
+          />
         </div>
         <p className="mt-4 text-lg leading-8 text-[var(--foreground)]">{sourceText}</p>
       </article>
