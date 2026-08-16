@@ -1,0 +1,5 @@
+interface:
+  display_name: "刘晓艳·四六级一对一"
+  short_description: "以刘晓艳(大雁)教学法为核心的大学英语四六级智能导师"
+  default_prompt: "使用 $liu-xiaoyan-cet-tutor，以刘晓艳老师的教学风格为我进行四六级英语一对一辅导"
+  brand_color: "#E74C3C"
