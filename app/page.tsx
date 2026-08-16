@@ -322,7 +322,7 @@ export default function HomePage() {
             />
           </div>
           <p className="mt-5 text-sm leading-6 text-[#737a88]">
-            完成率会记录到 Supabase，成为每日打卡和连续记录的基础。
+            每完成一项任务，都会离你的考试目标更近一步。
           </p>
         </article>
       </section>
