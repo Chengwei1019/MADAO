@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AuthPanel } from "@/components/AuthPanel";
 import { OnboardingPanel } from "@/components/OnboardingPanel";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 type Profile = {
   id: string;
@@ -218,6 +219,13 @@ export default function HomePage() {
     await loadSessionAndProfile();
   }
 
+  function taskStudyHref(task: DailyTask) {
+    if (task.task_type === "vocabulary") {
+      return `/study/vocabulary?taskId=${task.id}&userId=${profile?.id ?? ""}`;
+    }
+    return "#";
+  }
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center text-sm text-[#737a88]">
@@ -353,9 +361,18 @@ export default function HomePage() {
                     约 {task.estimated_minutes} 分钟
                   </span>
                 </span>
-                <span className="rounded-xl bg-[#f7f8fa] px-3 py-2 text-xs font-medium text-[#737a88]">
-                  {task.status === "completed" ? "已完成" : "待完成"}
-                </span>
+                {task.task_type === "vocabulary" && task.status !== "completed" ? (
+                  <Link
+                    href={taskStudyHref(task)}
+                    className="rounded-xl bg-[#4f6df5] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#3b5de7]"
+                  >
+                    开始学习
+                  </Link>
+                ) : (
+                  <span className="rounded-xl bg-[#f7f8fa] px-3 py-2 text-xs font-medium text-[#737a88]">
+                    {task.status === "completed" ? "已完成" : "待完成"}
+                  </span>
+                )}
                 {task.status !== "completed" ? (
                   <button
                     type="button"
