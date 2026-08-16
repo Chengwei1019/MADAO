@@ -20,11 +20,18 @@ export function VocabularyClient() {
     async function loadWords() {
       const supabase = createSupabaseBrowserClient();
       const { data, error } = await supabase
-        .from("words")
-        .select("id, word, phonetic, meaning, example");
+        .from("words_v2")
+        .select("id, word, phonetic_uk, meaning_cn, example_en");
 
       if (!error) {
-        const shuffled = [...(data ?? [])].sort(() => Math.random() - 0.5);
+        const mapped = (data ?? []).map((row) => ({
+          id: row.id,
+          word: row.word,
+          phonetic: row.phonetic_uk ?? "",
+          meaning: row.meaning_cn ?? "",
+          example: row.example_en ?? "",
+        }));
+        const shuffled = mapped.sort(() => Math.random() - 0.5);
         setWords(shuffled.slice(0, 10));
       }
       setLoading(false);

@@ -38,11 +38,16 @@ export function AssessmentClient() {
       setUserId(user.id);
 
       const { data, error } = await supabase
-        .from("words")
-        .select("id, word, meaning");
+        .from("words_v2")
+        .select("id, word, meaning_cn");
 
       if (!error) {
-        const shuffled = [...(data ?? [])].sort(() => Math.random() - 0.5);
+        const mapped = (data ?? []).map((row) => ({
+          id: row.id,
+          word: row.word,
+          meaning: row.meaning_cn ?? "",
+        }));
+        const shuffled = mapped.sort(() => Math.random() - 0.5);
         setWords(shuffled.slice(0, 20) as AssessmentWord[]);
       }
       setLoading(false);
