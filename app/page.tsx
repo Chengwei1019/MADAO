@@ -7,6 +7,21 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShareCardModal } from "@/components/ShareCardModal";
+import {
+  CalendarDays,
+  ChartNoAxesColumn,
+  BookMarked,
+  Heart,
+  Sparkles,
+  Share2,
+  Flame,
+  AlertTriangle,
+  BookOpen,
+  Languages,
+  PenLine,
+  Headphones,
+  type LucideIcon,
+} from "lucide-react";
 
 type Profile = {
   id: string;
@@ -409,12 +424,12 @@ export default function HomePage() {
   ).length;
 
   const streakDays = calculateStreak(checkIns);
-  const taskIcons: Record<string, string> = {
-    vocabulary: "词",
-    reading: "读",
-    translation: "译",
-    writing: "写",
-    listening: "听",
+  const taskIcons: Record<string, LucideIcon> = {
+    vocabulary: BookOpen,
+    reading: BookMarked,
+    translation: Languages,
+    writing: PenLine,
+    listening: Headphones,
   };
 
   return (
@@ -438,13 +453,13 @@ export default function HomePage() {
             href="/"
             className="flex items-center gap-3 rounded-xl bg-[var(--brand-soft)] px-3 py-2.5 text-sm font-semibold text-[var(--brand)]"
           >
-            <span>📅</span> 今日任务
+            <Sparkles size={18} strokeWidth={2} /> 今日任务
           </Link>
           <Link
             href="/assessment"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            <span>📊</span> 词汇测评
+            <ChartNoAxesColumn size={18} strokeWidth={2} /> 词汇测评
           </Link>
 
           <span className="mb-2 mt-6 px-3 text-[11px] font-medium uppercase tracking-wide text-[var(--muted)]">
@@ -454,19 +469,19 @@ export default function HomePage() {
             href="/review/calendar"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            <span>🗓️</span> 学习日历
+            <CalendarDays size={18} strokeWidth={2} /> 学习日历
           </Link>
           <Link
             href="/review/wrong-answers"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            <span>📕</span> 错题本
+            <BookMarked size={18} strokeWidth={2} /> 错题本
           </Link>
           <Link
             href="/review/favorites"
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            <span>⭐</span> 收藏夹
+            <Heart size={18} strokeWidth={2} /> 收藏夹
           </Link>
         </nav>
 
@@ -476,7 +491,9 @@ export default function HomePage() {
             onClick={() => setShowShare(true)}
             className="rounded-xl border border-[var(--line)] px-3 py-2.5 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            📤 分享学习记录
+            <span className="flex items-center gap-2">
+              <Share2 size={16} strokeWidth={2} /> 分享学习记录
+            </span>
           </button>
           <div className="flex items-center gap-2 px-3 py-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand)] text-xs font-semibold text-white">
@@ -526,7 +543,7 @@ export default function HomePage() {
 
         {brokenStreak ? (
           <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[var(--warning)] bg-[var(--warning-soft)] px-5 py-4">
-            <span className="text-xl">⚠️</span>
+            <AlertTriangle size={20} strokeWidth={2} className="text-[var(--warning)]" />
             <div className="flex-1">
               <div className="text-sm font-semibold text-[var(--warning)]">
                 昨天的学习中断了
@@ -539,13 +556,13 @@ export default function HomePage() {
         ) : null}
 
         <section className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-          <article className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-7">
+          <article className="rounded-[var(--radius-card)] bg-[var(--card)] p-7 shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between">
               <div className="text-sm font-medium text-[var(--muted)]">
                 距离{examLabel}考试
               </div>
               <div className="flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-3 py-1 text-sm font-semibold text-[var(--accent)]">
-                🔥 连续 {streakDays} 天
+                <Flame size={15} strokeWidth={2.5} /> 连续 {streakDays} 天
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-3">
@@ -567,7 +584,7 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-7">
+          <article className="rounded-[var(--radius-card)] bg-[var(--card)] p-7 shadow-[var(--shadow-card)]">
             <div className="text-sm font-medium text-[var(--muted)]">今日完成</div>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="text-5xl font-semibold tabular-nums tracking-tight">
@@ -607,8 +624,11 @@ export default function HomePage() {
                   key={task.id}
                   className="flex items-center gap-4 rounded-xl border border-[var(--line)] bg-[var(--card)] p-4"
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-sm font-semibold text-[var(--brand)]">
-                    {taskIcons[task.task_type] ?? "学"}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-[var(--brand)]">
+                    {(() => {
+                      const Icon = taskIcons[task.task_type] ?? BookOpen;
+                      return <Icon size={19} strokeWidth={2} />;
+                    })()}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span
@@ -653,7 +673,9 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--card)] px-6 py-12 text-center">
-              <div className="text-3xl">📋</div>
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--brand-soft)] text-[var(--brand)]">
+                <Sparkles size={24} strokeWidth={2} />
+              </div>
               <h3 className="mt-4 text-base font-semibold">今日计划尚未生成</h3>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
                 AI 会根据你的考试日期和每日时间，自动安排今天要完成的单词、阅读、翻译等任务。
@@ -678,7 +700,7 @@ export default function HomePage() {
 
       {showSettings ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5">
-          <div className="w-full max-w-sm rounded-[24px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_20px_60px_rgba(30,35,55,0.18)]">
+          <div className="w-full max-w-sm rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[var(--shadow-pop)]">
             <h3 className="text-lg font-semibold">每日学习预算</h3>
             <p className="mt-1 text-sm text-[var(--muted)]">
               调整每天想投入的学习时间，AI 会按这个时长排任务。
