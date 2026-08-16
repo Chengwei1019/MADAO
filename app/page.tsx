@@ -320,6 +320,9 @@ export default function HomePage() {
     if (task.task_type === "vocabulary") {
       return `/study/vocabulary?taskId=${task.id}&userId=${profile?.id ?? ""}`;
     }
+    if (task.task_type === "reading") {
+      return `/study/reading?taskId=${task.id}&userId=${profile?.id ?? ""}`;
+    }
     return "#";
   }
 
@@ -469,7 +472,9 @@ export default function HomePage() {
                     约 {task.estimated_minutes} 分钟
                   </span>
                 </span>
-                {task.task_type === "vocabulary" && task.status !== "completed" ? (
+                {(task.task_type === "vocabulary" ||
+                  task.task_type === "reading") &&
+                task.status !== "completed" ? (
                   <Link
                     href={taskStudyHref(task)}
                     className="rounded-xl bg-[#4f6df5] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#3b5de7]"
