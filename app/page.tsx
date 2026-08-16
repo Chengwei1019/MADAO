@@ -35,6 +35,52 @@ function remainingDays(target: string) {
   return Math.max(0, Math.ceil((end.getTime() - now.getTime()) / 86_400_000));
 }
 
+function calculateStreak(checkDates: string[]) {
+  const dateSet = new Set(checkDates);
+  let streak = 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+
+  // If today is not checked yet, start counting from yesterday.
+  const todayKey = cursor.toISOString().slice(0, 10);
+  if (!dateSet.has(todayKey)) {
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  while (dateSet.has(cursor.toISOString().slice(0, 10))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+function buildHeatmap(checkDates: string[]) {
+  const dateSet = new Set(checkDates);
+  const cells: React.ReactNode[] = [];
+  const weeks = 14;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(today);
+  start.setDate(start.getDate() - weeks * 7 + 1);
+
+  for (let i = 0; i < weeks * 7; i += 1) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + i);
+    const key = day.toISOString().slice(0, 10);
+    const active = dateSet.has(key);
+    cells.push(
+      <span
+        key={key}
+        title={key}
+        className={`h-3 w-3 rounded-[4px] ${
+          active ? "bg-[#4f6df5]" : "bg-[#eef0f4]"
+        }`}
+      />,
+    );
+  }
+  return cells;
+}
+
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
@@ -45,6 +91,7 @@ export default function HomePage() {
     level: string;
     vocabulary_score: number;
   } | null>(null);
+  const [checkIns, setCheckIns] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
   const [planError, setPlanError] = useState("");
 
@@ -87,6 +134,17 @@ export default function HomePage() {
         .order("order_index")
         .limit(10);
       setTasks((taskData ?? []) as DailyTask[]);
+
+      const since = new Date();
+      since.setDate(since.getDate() - 90);
+      const { data: checkInData } = await supabase
+        .from("check_ins")
+        .select("check_date")
+        .eq("user_id", user.id)
+        .gte("check_date", since.toISOString().slice(0, 10));
+      setCheckIns(
+        (checkInData ?? []).map((row: { check_date: string }) => row.check_date),
+      );
     }
 
     setLoading(false);
@@ -272,6 +330,8 @@ export default function HomePage() {
   const completedCount = tasks.filter(
     (task) => task.status === "completed",
   ).length;
+
+  const streakDays = calculateStreak(checkIns);
   const taskIcons: Record<string, string> = {
     vocabulary: "词",
     reading: "读",
@@ -336,7 +396,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="rounded-2xl bg-[#e9edff] px-3 py-2 text-sm font-semibold text-[#4f6df5]">
-              预计 {totalMinutes} 分钟
+              连续 {streakDays} 天
             </div>
           </div>
           <div className="mt-7 h-3 overflow-hidden rounded-full bg-[#eef0f4]">
@@ -350,6 +410,12 @@ export default function HomePage() {
           <p className="mt-5 text-sm leading-6 text-[#737a88]">
             每完成一项任务，都会离你的考试目标更近一步。
           </p>
+          <div className="mt-5 border-t border-[#eef0f4] pt-4">
+            <div className="mb-2 text-xs text-[#737a88]">最近 14 周打卡</div>
+            <div className="grid grid-flow-col grid-rows-7 gap-1">
+              {buildHeatmap(checkIns)}
+            </div>
+          </div>
         </article>
       </section>
 
