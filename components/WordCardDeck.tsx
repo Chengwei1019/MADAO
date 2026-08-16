@@ -24,6 +24,7 @@ export function WordCardDeck({
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [known, setKnown] = useState(0);
+  const [lastKnown, setLastKnown] = useState(true);
   const [finished, setFinished] = useState(false);
 
   if (!words.length) {
@@ -37,11 +38,15 @@ export function WordCardDeck({
   const current = words[index];
   const progress = Math.round((index / words.length) * 100);
 
-  function handleChoice(isKnown: boolean) {
-    const nextKnown = known + (isKnown ? 1 : 0);
+  function revealChoice(isKnown: boolean) {
+    setLastKnown(isKnown);
+    setRevealed(true);
+  }
+
+  function nextCard() {
+    const nextKnown = known + (lastKnown ? 1 : 0);
     setKnown(nextKnown);
     setRevealed(false);
-
     if (index + 1 >= words.length) {
       setFinished(true);
       onFinish(nextKnown);
@@ -93,11 +98,7 @@ export function WordCardDeck({
         />
       </div>
 
-      <button
-        type="button"
-        onClick={() => setRevealed(!revealed)}
-        className="mt-8 flex min-h-[320px] w-full flex-col items-center justify-center rounded-[28px] border border-[#e4e7ed] bg-white p-10 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)] transition hover:border-[#4f6df5]"
-      >
+      <div className="mt-8 flex min-h-[320px] w-full flex-col items-center justify-center rounded-[28px] border border-[#e4e7ed] bg-white p-10 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
         <div className="text-4xl font-semibold tracking-tight">
           {current.word}
         </div>
@@ -114,29 +115,37 @@ export function WordCardDeck({
           </div>
         ) : (
           <div className="mt-8 text-sm text-[#b2b8c4]">
-            点击卡片查看释义
+            先判断认不认识，再看释义
           </div>
         )}
-      </button>
-
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          disabled={!revealed}
-          onClick={() => handleChoice(false)}
-          className="rounded-2xl border border-[#e4e7ed] bg-white px-5 py-3 text-sm font-semibold text-[#737a88] transition hover:bg-[#f7f8fa] disabled:opacity-40"
-        >
-          不认识
-        </button>
-        <button
-          type="button"
-          disabled={!revealed}
-          onClick={() => handleChoice(true)}
-          className="rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-40"
-        >
-          认识
-        </button>
       </div>
+
+      {revealed ? (
+        <button
+          type="button"
+          onClick={nextCard}
+          className="mt-6 w-full rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
+        >
+          {index + 1 >= words.length ? "查看结果" : "下一词"}
+        </button>
+      ) : (
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => revealChoice(false)}
+            className="rounded-2xl border border-[#e4e7ed] bg-white px-5 py-3 text-sm font-semibold text-[#737a88] transition hover:bg-[#f7f8fa]"
+          >
+            不认识
+          </button>
+          <button
+            type="button"
+            onClick={() => revealChoice(true)}
+            className="rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
+          >
+            认识
+          </button>
+        </div>
+      )}
     </main>
   );
 }
