@@ -418,252 +418,263 @@ export default function HomePage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col px-5 py-6 sm:px-8">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--brand)] text-lg font-bold text-white">
+    <main className="flex min-h-screen">
+      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-[var(--line)] bg-[var(--card)] px-4 py-6 lg:flex">
+        <div className="flex items-center gap-3 px-2">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--brand)] text-base font-bold text-white">
             M
           </span>
           <div>
-            <div className="text-lg font-semibold tracking-tight">Metis</div>
-            <div className="text-xs text-[var(--muted)]">四六级督学工作台</div>
+            <div className="text-base font-semibold tracking-tight">Metis</div>
+            <div className="text-[11px] text-[var(--muted)]">四六级督学工作台</div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
+
+        <nav className="mt-8 flex flex-col gap-1">
+          <span className="mb-2 px-3 text-[11px] font-medium uppercase tracking-wide text-[var(--muted)]">
+            学习
+          </span>
+          <Link
+            href="/"
+            className="flex items-center gap-3 rounded-xl bg-[var(--brand-soft)] px-3 py-2.5 text-sm font-semibold text-[var(--brand)]"
+          >
+            <span>📅</span> 今日任务
+          </Link>
+          <Link
+            href="/assessment"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+          >
+            <span>📊</span> 词汇测评
+          </Link>
+
+          <span className="mb-2 mt-6 px-3 text-[11px] font-medium uppercase tracking-wide text-[var(--muted)]">
+            记录
+          </span>
+          <Link
+            href="/review/calendar"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+          >
+            <span>🗓️</span> 学习日历
+          </Link>
+          <Link
+            href="/review/wrong-answers"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+          >
+            <span>📕</span> 错题本
+          </Link>
+          <Link
+            href="/review/favorites"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+          >
+            <span>⭐</span> 收藏夹
+          </Link>
+        </nav>
+
+        <div className="mt-auto flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => setShowShare(true)}
+            className="rounded-xl border border-[var(--line)] px-3 py-2.5 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
+          >
+            📤 分享学习记录
+          </button>
+          <div className="flex items-center gap-2 px-3 py-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand)] text-xs font-semibold text-white">
+              {profile.username.slice(0, 2).toUpperCase()}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-sm text-[var(--foreground)]">
+              {profile.username}
+            </span>
+            <ThemeToggle />
+          </div>
           <button
             type="button"
             onClick={openSettings}
-            className="rounded-full border border-[var(--line)] bg-[var(--card)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)]"
+            className="rounded-xl px-3 py-2 text-left text-xs text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            {profile.username}
+            每日预算 {profile.daily_minutes} 分钟 · 设置
           </button>
           <button
             type="button"
             onClick={handleSignOut}
-            className="rounded-full border border-[var(--line)] bg-[var(--card)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)]"
+            className="rounded-xl px-3 py-2 text-left text-xs text-[var(--muted)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
           >
-            退出
+            退出登录
           </button>
         </div>
-      </header>
+      </aside>
 
-      {brokenStreak ? (
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[var(--warning)] bg-[var(--warning-soft)] px-5 py-4">
-          <span className="text-xl">⚠️</span>
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-[var(--warning)]">
-              昨天的学习中断了
-            </div>
-            <div className="mt-0.5 text-xs text-[var(--warning)]">
-              连续记录已经重置，今天重新开始，别让状态溜走。
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      <section className="mt-9 grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-        <article className="rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
-          <div className="text-sm font-medium tracking-wide text-[#4f6df5]">
-            今日简报
-          </div>
-          <h1 className="mt-4 max-w-xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            距离{examLabel}考试还有 {daysLeft} 天。
-          </h1>
-          <p className="mt-3 max-w-xl text-base leading-7 text-[var(--muted)]">
-            你的每日学习预算是 {profile.daily_minutes} 分钟。打开工作台，
-            只完成今天该完成的，不需要纠结学什么。
-          </p>
-          <div className="mt-6 flex gap-3">
-            <span className="rounded-2xl bg-[var(--brand-soft)] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
-              {examLabel}备考
+      <div className="min-w-0 flex-1 px-5 py-8 sm:px-8">
+        <header className="mb-8 flex items-center justify-between lg:hidden">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--brand)] text-base font-bold text-white">
+              M
             </span>
-            <span className="rounded-2xl bg-[var(--brand-soft)] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
-              {assessment ? `词汇 ${assessment.level}` : "未测评"}
-            </span>
-            <span className="rounded-2xl bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted)]">
-              今日预算 {profile.daily_minutes} 分钟
-            </span>
+            <div className="text-base font-semibold tracking-tight">Metis</div>
           </div>
-        </article>
-
-        <article className="rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm font-medium text-[var(--muted)]">今日完成</div>
-              <div className="mt-3 text-4xl font-semibold tracking-tight">
-                {completedCount}
-                <span className="text-xl text-[var(--muted)]">/{tasks.length}</span>
-              </div>
-            </div>
-            <div className="rounded-2xl bg-[var(--brand-soft)] px-3 py-2 text-sm font-semibold text-[#4f6df5]">
-              连续 {streakDays} 天
-            </div>
-          </div>
-          <div className="mt-7 h-3 overflow-hidden rounded-full bg-[var(--surface-strong)]">
-            <div
-              className="h-full rounded-full bg-[var(--brand)] transition-all"
-              style={{
-                width: `${tasks.length ? (completedCount / tasks.length) * 100 : 0}%`,
-              }}
-            />
-          </div>
-          <p className="mt-5 text-sm leading-6 text-[var(--muted)]">
-            每完成一项任务，都会离你的考试目标更近一步。
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowShare(true)}
-            className="mt-4 w-full rounded-xl border border-[var(--line)] px-4 py-2 text-xs font-semibold text-[var(--brand)] transition hover:bg-[var(--surface)]"
-          >
-            生成分享卡片
-          </button>
-          <div className="mt-5 border-t border-[#eef0f4] pt-4">
-            <div className="mb-2 text-xs text-[var(--muted)]">最近 14 周打卡</div>
-            <div className="grid grid-flow-col grid-rows-7 gap-1">
-              {buildHeatmap(checkIns)}
-            </div>
-            <Link
-              href="/review/calendar"
-              className="mt-3 block text-center text-xs font-medium text-[var(--brand)] transition hover:opacity-80"
-            >
-              查看完整学习日历 →
-            </Link>
-          </div>
-        </article>
-      </section>
-
-      <section className="mt-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">今日任务</h2>
-          <span className="text-sm text-[var(--muted)]">
-            {tasks.length ? "任务来自你的每日计划" : "等待生成计划"}
-          </span>
-        </div>
-
-        {tasks.length ? (
-          <div className="grid gap-3">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center gap-4 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-4"
-              >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--brand-soft)] text-sm font-semibold text-[#4f6df5]">
-                  {taskIcons[task.task_type] ?? "学"}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold">
-                    {task.title}
-                  </span>
-                  <span className="mt-1 block text-xs text-[var(--muted)]">
-                    约 {task.estimated_minutes} 分钟
-                  </span>
-                </span>
-                {(task.task_type === "vocabulary" ||
-                  task.task_type === "reading" ||
-                  task.task_type === "translation") &&
-                task.status !== "completed" ? (
-                  <Link
-                    href={taskStudyHref(task)}
-                    className="rounded-xl bg-[var(--brand)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--brand-strong)]"
-                  >
-                    开始学习
-                  </Link>
-                ) : (
-                  <span className="rounded-xl bg-[var(--surface)] px-3 py-2 text-xs font-medium text-[var(--muted)]">
-                    {task.status === "completed" ? "已完成" : "待完成"}
-                  </span>
-                )}
-                {task.status !== "completed" ? (
-                  <button
-                    type="button"
-                    onClick={() => handleCompleteTask(task.id)}
-                    className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[#4f6df5] transition hover:bg-[#dde4ff]"
-                  >
-                    完成
-                  </button>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-[24px] border border-dashed border-[#d9dde6] bg-[var(--card)] px-6 py-10 text-center">
-            <div className="text-3xl">📋</div>
-            <h3 className="mt-4 text-base font-semibold">今日计划尚未生成</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
-              AI 会根据你的考试日期和每日时间，自动安排今天要完成的单词、阅读、翻译等任务。
-            </p>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <button
               type="button"
-              disabled={generating}
-              onClick={handleGeneratePlan}
-              className="mt-6 rounded-2xl bg-[var(--brand)] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-60"
+              onClick={handleSignOut}
+              className="rounded-lg px-3 py-1.5 text-sm text-[var(--muted)]"
             >
-              {generating ? "AI 正在编排今日任务..." : "让 AI 生成今日计划"}
+              退出
             </button>
-            {planError ? (
-              <p className="mx-auto mt-4 max-w-md rounded-xl bg-[var(--danger-soft)] px-4 py-3 text-sm text-[var(--danger)]">
-                {planError}
-              </p>
-            ) : null}
           </div>
-        )}
-      </section>
+        </header>
 
-      <section className="mt-6">
-        <Link
-          href="/assessment"
-          className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 transition hover:border-[var(--brand)]"
-        >
-          <span>
-            <span className="block text-sm font-semibold">
-              {assessment ? "重新测评词汇水平" : "先做 5 分钟水平测评"}
-            </span>
-            <span className="mt-1 block text-xs text-[var(--muted)]">
-              {assessment
-                ? `当前词汇水平：${assessment.level}`
-                : "让 AI 了解你的基础，才能排出真正适合你的任务"}
-            </span>
-          </span>
-          <span className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[#4f6df5]">
-            {assessment ? "重新测评" : "开始"}
-          </span>
-        </Link>
-      </section>
+        {brokenStreak ? (
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-[var(--warning)] bg-[var(--warning-soft)] px-5 py-4">
+            <span className="text-xl">⚠️</span>
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-[var(--warning)]">
+                昨天的学习中断了
+              </div>
+              <div className="mt-0.5 text-xs text-[var(--warning)]">
+                连续记录已经重置，今天重新开始，别让状态溜走。
+              </div>
+            </div>
+          </div>
+        ) : null}
 
-      <section className="mt-6">
-        <Link
-          href="/review/wrong-answers"
-          className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 transition hover:border-[var(--brand)]"
-        >
-          <span>
-            <span className="block text-sm font-semibold">错题本</span>
-            <span className="mt-1 block text-xs text-[var(--muted)]">
-              阅读做错的题目会自动收录到这里
-            </span>
-          </span>
-          <span className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[var(--brand)]">
-            查看
-          </span>
-        </Link>
-      </section>
+        <section className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+          <article className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-7">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-[var(--muted)]">
+                距离{examLabel}考试
+              </div>
+              <div className="flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-3 py-1 text-sm font-semibold text-[var(--accent)]">
+                🔥 连续 {streakDays} 天
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-3">
+              <span className="text-5xl font-semibold tabular-nums tracking-tight">
+                {daysLeft}
+              </span>
+              <span className="text-lg text-[var(--muted)]">天</span>
+            </div>
+            <p className="mt-4 max-w-md text-sm leading-6 text-[var(--muted)]">
+              每天 {profile.daily_minutes} 分钟，只完成今天该完成的，不需要纠结学什么。
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="rounded-full bg-[var(--brand-soft)] px-3 py-1 text-xs font-medium text-[var(--brand)]">
+                {examLabel}备考
+              </span>
+              <span className="rounded-full bg-[var(--brand-soft)] px-3 py-1 text-xs font-medium text-[var(--brand)]">
+                {assessment ? `词汇 ${assessment.level}` : "未测评"}
+              </span>
+            </div>
+          </article>
 
-      <section className="mt-6">
-        <Link
-          href="/review/favorites"
-          className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 transition hover:border-[var(--brand)]"
-        >
-          <span>
-            <span className="block text-sm font-semibold">收藏夹</span>
-            <span className="mt-1 block text-xs text-[var(--muted)]">
-              收藏的单词、例句、翻译原句和作文题目
+          <article className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-7">
+            <div className="text-sm font-medium text-[var(--muted)]">今日完成</div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-5xl font-semibold tabular-nums tracking-tight">
+                {completedCount}
+              </span>
+              <span className="text-xl text-[var(--muted)]">/{tasks.length}</span>
+            </div>
+            <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[var(--surface-strong)]">
+              <div
+                className="h-full rounded-full bg-[var(--brand)] transition-all"
+                style={{
+                  width: `${tasks.length ? (completedCount / tasks.length) * 100 : 0}%`,
+                }}
+              />
+            </div>
+            <div className="mt-5 border-t border-[var(--surface-strong)] pt-4">
+              <div className="mb-2 text-xs text-[var(--muted)]">最近 14 周打卡</div>
+              <div className="grid grid-flow-col grid-rows-7 gap-1">
+                {buildHeatmap(checkIns)}
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section className="mt-8">
+          <div className="mb-4 flex items-center justify-between">
+            <h1 className="text-xl font-semibold tracking-tight">今日任务</h1>
+            <span className="text-sm text-[var(--muted)]">
+              {tasks.length ? `预计 ${totalMinutes} 分钟` : "等待生成计划"}
             </span>
-          </span>
-          <span className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[var(--brand)]">
-            查看
-          </span>
-        </Link>
-      </section>
+          </div>
+
+          {tasks.length ? (
+            <div className="grid gap-3">
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-4 rounded-xl border border-[var(--line)] bg-[var(--card)] p-4"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-sm font-semibold text-[var(--brand)]">
+                    {taskIcons[task.task_type] ?? "学"}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={`block text-sm font-semibold ${
+                        task.status === "completed"
+                          ? "text-[var(--muted)] line-through"
+                          : ""
+                      }`}
+                    >
+                      {task.title}
+                    </span>
+                    <span className="mt-1 block text-xs text-[var(--muted)]">
+                      约 {task.estimated_minutes} 分钟
+                    </span>
+                  </span>
+                  {(task.task_type === "vocabulary" ||
+                    task.task_type === "reading" ||
+                    task.task_type === "translation") &&
+                  task.status !== "completed" ? (
+                    <Link
+                      href={taskStudyHref(task)}
+                      className="rounded-lg bg-[var(--brand)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--brand-strong)]"
+                    >
+                      开始学习
+                    </Link>
+                  ) : (
+                    <span className="rounded-lg bg-[var(--surface)] px-3 py-2 text-xs font-medium text-[var(--muted)]">
+                      {task.status === "completed" ? "已完成" : "待完成"}
+                    </span>
+                  )}
+                  {task.status !== "completed" ? (
+                    <button
+                      type="button"
+                      onClick={() => handleCompleteTask(task.id)}
+                      className="rounded-lg bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[var(--brand)] transition hover:opacity-80"
+                    >
+                      完成
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--card)] px-6 py-12 text-center">
+              <div className="text-3xl">📋</div>
+              <h3 className="mt-4 text-base font-semibold">今日计划尚未生成</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
+                AI 会根据你的考试日期和每日时间，自动安排今天要完成的单词、阅读、翻译等任务。
+              </p>
+              <button
+                type="button"
+                disabled={generating}
+                onClick={handleGeneratePlan}
+                className="mt-6 rounded-xl bg-[var(--brand)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--brand-strong)] disabled:opacity-60"
+              >
+                {generating ? "AI 正在编排今日任务..." : "让 AI 生成今日计划"}
+              </button>
+              {planError ? (
+                <p className="mx-auto mt-4 max-w-md rounded-xl bg-[var(--danger-soft)] px-4 py-3 text-sm text-[var(--danger)]">
+                  {planError}
+                </p>
+              ) : null}
+            </div>
+          )}
+        </section>
+      </div>
 
       {showSettings ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5">

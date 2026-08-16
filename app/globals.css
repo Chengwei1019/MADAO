@@ -17,6 +17,8 @@
   --success-soft: #f0fdf4;
   --warning: #f59e0b;
   --warning-soft: #fff7ed;
+  --accent: #f59e0b;
+  --accent-soft: #fff7ed;
   --text-dim: #b2b8c4;
 }
 
@@ -37,6 +39,8 @@
   --success-soft: #14251b;
   --warning: #fbbf24;
   --warning-soft: #2a2117;
+  --accent: #fbbf24;
+  --accent-soft: #2a2117;
   --text-dim: #555a66;
 }
 
