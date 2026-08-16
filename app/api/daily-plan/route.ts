@@ -24,6 +24,14 @@ export async function POST(request: Request) {
       examDate,
       level,
       minutesAvailable,
+      vocabularyScore:
+        typeof body.vocabularyScore === "number"
+          ? body.vocabularyScore
+          : undefined,
+      assessmentLevel:
+        typeof body.assessmentLevel === "string"
+          ? body.assessmentLevel
+          : undefined,
       completedTaskTypes: Array.isArray(body.completedTaskTypes)
         ? body.completedTaskTypes.map(String)
         : undefined,

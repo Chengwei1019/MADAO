@@ -41,6 +41,10 @@ export default function HomePage() {
   const [email, setEmail] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tasks, setTasks] = useState<DailyTask[]>([]);
+  const [assessment, setAssessment] = useState<{
+    level: string;
+    vocabulary_score: number;
+  } | null>(null);
   const [generating, setGenerating] = useState(false);
   const [planError, setPlanError] = useState("");
 
@@ -67,6 +71,15 @@ export default function HomePage() {
     setProfile(profileData as Profile | null);
 
     if (profileData) {
+      const { data: assessmentData } = await supabase
+        .from("assessments")
+        .select("level, vocabulary_score")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setAssessment(assessmentData as { level: string; vocabulary_score: number } | null);
+
       const { data: taskData } = await supabase
         .from("daily_tasks")
         .select("id, task_type, title, estimated_minutes, status")
@@ -102,10 +115,12 @@ export default function HomePage() {
       const response = await fetch("/api/daily-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      body: JSON.stringify({
           examDate: profile.exam_date,
           level: profile.exam_type,
           minutesAvailable: profile.daily_minutes,
+          vocabularyScore: assessment?.vocabulary_score,
+          assessmentLevel: assessment?.level,
         }),
       });
       const data = await response.json();
@@ -302,6 +317,9 @@ export default function HomePage() {
             <span className="rounded-2xl bg-[#e9edff] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
               {examLabel}备考
             </span>
+            <span className="rounded-2xl bg-[#e9edff] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
+              {assessment ? `词汇 ${assessment.level}` : "未测评"}
+            </span>
             <span className="rounded-2xl bg-[#f7f8fa] px-4 py-2 text-sm font-medium text-[#737a88]">
               今日预算 {profile.daily_minutes} 分钟
             </span>
@@ -407,6 +425,27 @@ export default function HomePage() {
             ) : null}
           </div>
         )}
+      </section>
+
+      <section className="mt-6">
+        <Link
+          href="/assessment"
+          className="flex items-center justify-between rounded-2xl border border-[#e4e7ed] bg-white p-5 transition hover:border-[#4f6df5]"
+        >
+          <span>
+            <span className="block text-sm font-semibold">
+              {assessment ? "重新测评词汇水平" : "先做 5 分钟水平测评"}
+            </span>
+            <span className="mt-1 block text-xs text-[#737a88]">
+              {assessment
+                ? `当前词汇水平：${assessment.level}`
+                : "让 AI 了解你的基础，才能排出真正适合你的任务"}
+            </span>
+          </span>
+          <span className="rounded-xl bg-[#e9edff] px-4 py-2 text-xs font-semibold text-[#4f6df5]">
+            {assessment ? "重新测评" : "开始"}
+          </span>
+        </Link>
       </section>
     </main>
   );

@@ -25,6 +25,8 @@ export async function generateDailyPlan(input: {
   level: "cet4" | "cet6";
   minutesAvailable: number;
   completedTaskTypes?: string[];
+  vocabularyScore?: number;
+  assessmentLevel?: string;
 }): Promise<DailyPlanOutput> {
   if (!aiClient) {
     throw new Error("DeepSeek API Key is not configured.");
