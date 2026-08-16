@@ -36,7 +36,7 @@ export function AssessmentFlow({
 
   if (!words.length) {
     return (
-      <main className="mx-auto max-w-xl px-5 py-12 text-center text-[#737a88]">
+      <main className="mx-auto max-w-xl px-5 py-12 text-center text-[var(--muted)]">
         词库还没有单词，请先在 Supabase 执行 seed 数据。
       </main>
     );
@@ -73,28 +73,28 @@ export function AssessmentFlow({
         <button
           type="button"
           onClick={onExit}
-          className="text-sm font-medium text-[#737a88] transition hover:text-[#3a3f4b]"
+          className="text-sm font-medium text-[var(--muted)] transition hover:text-[var(--foreground)]"
         >
           ← 退出测评
         </button>
-        <span className="text-sm text-[#737a88]">
+        <span className="text-sm text-[var(--muted)]">
           {index + 1} / {words.length}
         </span>
       </div>
 
-      <div className="h-2 overflow-hidden rounded-full bg-[#eef0f4]">
+      <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-strong)]">
         <div
-          className="h-full rounded-full bg-[#4f6df5] transition-all"
+          className="h-full rounded-full bg-[var(--brand)] transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <div className="mt-8 rounded-[24px] border border-[#e4e7ed] bg-white px-6 py-8 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
-        <div className="text-sm text-[#b2b8c4]">你是否认识这个词？</div>
+      <div className="mt-8 rounded-[24px] border border-[var(--line)] bg-[var(--card)] px-6 py-8 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
+        <div className="text-sm text-[var(--text-dim)]">你是否认识这个词？</div>
         <div className="mt-5 text-4xl font-semibold tracking-tight">
           {current.word}
         </div>
-        <div className="mt-3 text-sm leading-6 text-[#737a88]">
+        <div className="mt-3 text-sm leading-6 text-[var(--muted)]">
           {current.meaning}
         </div>
       </div>
@@ -103,14 +103,14 @@ export function AssessmentFlow({
         <button
           type="button"
           onClick={() => answer(false)}
-          className="rounded-2xl border border-[#e4e7ed] bg-white px-5 py-3 text-sm font-semibold text-[#737a88] transition hover:bg-[#f7f8fa]"
+          className="rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-sm font-semibold text-[var(--muted)] transition hover:bg-[var(--surface)]"
         >
           不认识
         </button>
         <button
           type="button"
           onClick={() => answer(true)}
-          className="rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
+          className="rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
         >
           认识
         </button>

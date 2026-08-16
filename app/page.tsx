@@ -5,6 +5,7 @@ import { AuthPanel } from "@/components/AuthPanel";
 import { OnboardingPanel } from "@/components/OnboardingPanel";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Profile = {
   id: string;
@@ -80,7 +81,7 @@ function buildHeatmap(checkDates: string[]) {
         key={key}
         title={key}
         className={`h-3 w-3 rounded-[4px] ${
-          active ? "bg-[#4f6df5]" : "bg-[#eef0f4]"
+          active ? "bg-[var(--brand)]" : "bg-[var(--surface-strong)]"
         }`}
       />,
     );
@@ -112,6 +113,9 @@ export default function HomePage() {
   const [brokenStreak, setBrokenStreak] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [planError, setPlanError] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+  const [draftMinutes, setDraftMinutes] = useState(30);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const loadSessionAndProfile = useCallback(async () => {
     const supabase = createSupabaseBrowserClient();
@@ -197,6 +201,28 @@ export default function HomePage() {
     setTasks([]);
     setUserId("");
     setEmail("");
+  }
+
+  function openSettings() {
+    setDraftMinutes(profile?.daily_minutes ?? 30);
+    setShowSettings(true);
+  }
+
+  async function saveSettings() {
+    if (!profile) return;
+    setSavingSettings(true);
+    const supabase = createSupabaseBrowserClient();
+    const { error } = await supabase
+      .from("profiles")
+      .update({ daily_minutes: draftMinutes })
+      .eq("id", profile.id);
+    setSavingSettings(false);
+    if (error) {
+      setPlanError(error.message);
+      return;
+    }
+    setShowSettings(false);
+    await loadSessionAndProfile();
   }
 
   async function handleGeneratePlan() {
@@ -341,12 +367,15 @@ export default function HomePage() {
     if (task.task_type === "reading") {
       return `/study/reading?taskId=${task.id}&userId=${profile?.id ?? ""}`;
     }
+    if (task.task_type === "translation") {
+      return `/study/translation?taskId=${task.id}&userId=${profile?.id ?? ""}`;
+    }
     return "#";
   }
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-sm text-[#737a88]">
+      <main className="flex min-h-screen items-center justify-center text-sm text-[var(--muted)]">
         正在加载你的学习工作台...
       </main>
     );
@@ -389,31 +418,41 @@ export default function HomePage() {
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col px-5 py-6 sm:px-8">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#4f6df5] text-lg font-bold text-white">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--brand)] text-lg font-bold text-white">
             M
           </span>
           <div>
             <div className="text-lg font-semibold tracking-tight">Metis</div>
-            <div className="text-xs text-[#737a88]">四六级督学工作台</div>
+            <div className="text-xs text-[var(--muted)]">四六级督学工作台</div>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="rounded-full border border-[#e4e7ed] bg-white px-4 py-2 text-sm font-medium text-[#737a88] transition hover:bg-[#f7f8fa]"
-        >
-          {profile.username} · 退出
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={openSettings}
+            className="rounded-full border border-[var(--line)] bg-[var(--card)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)]"
+          >
+            {profile.username}
+          </button>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="rounded-full border border-[var(--line)] bg-[var(--card)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)]"
+          >
+            退出
+          </button>
+        </div>
       </header>
 
       {brokenStreak ? (
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[var(--warning)] bg-[var(--warning-soft)] px-5 py-4">
           <span className="text-xl">⚠️</span>
           <div className="flex-1">
-            <div className="text-sm font-semibold text-amber-800">
+            <div className="text-sm font-semibold text-[var(--warning)]">
               昨天的学习中断了
             </div>
-            <div className="mt-0.5 text-xs text-amber-700">
+            <div className="mt-0.5 text-xs text-[var(--warning)]">
               连续记录已经重置，今天重新开始，别让状态溜走。
             </div>
           </div>
@@ -421,56 +460,56 @@ export default function HomePage() {
       ) : null}
 
       <section className="mt-9 grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-        <article className="rounded-[28px] border border-[#e4e7ed] bg-white p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
+        <article className="rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
           <div className="text-sm font-medium tracking-wide text-[#4f6df5]">
             今日简报
           </div>
           <h1 className="mt-4 max-w-xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             距离{examLabel}考试还有 {daysLeft} 天。
           </h1>
-          <p className="mt-3 max-w-xl text-base leading-7 text-[#737a88]">
+          <p className="mt-3 max-w-xl text-base leading-7 text-[var(--muted)]">
             你的每日学习预算是 {profile.daily_minutes} 分钟。打开工作台，
             只完成今天该完成的，不需要纠结学什么。
           </p>
           <div className="mt-6 flex gap-3">
-            <span className="rounded-2xl bg-[#e9edff] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
+            <span className="rounded-2xl bg-[var(--brand-soft)] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
               {examLabel}备考
             </span>
-            <span className="rounded-2xl bg-[#e9edff] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
+            <span className="rounded-2xl bg-[var(--brand-soft)] px-4 py-2 text-sm font-semibold text-[#4f6df5]">
               {assessment ? `词汇 ${assessment.level}` : "未测评"}
             </span>
-            <span className="rounded-2xl bg-[#f7f8fa] px-4 py-2 text-sm font-medium text-[#737a88]">
+            <span className="rounded-2xl bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted)]">
               今日预算 {profile.daily_minutes} 分钟
             </span>
           </div>
         </article>
 
-        <article className="rounded-[28px] border border-[#e4e7ed] bg-white p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
+        <article className="rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-sm font-medium text-[#737a88]">今日完成</div>
+              <div className="text-sm font-medium text-[var(--muted)]">今日完成</div>
               <div className="mt-3 text-4xl font-semibold tracking-tight">
                 {completedCount}
-                <span className="text-xl text-[#737a88]">/{tasks.length}</span>
+                <span className="text-xl text-[var(--muted)]">/{tasks.length}</span>
               </div>
             </div>
-            <div className="rounded-2xl bg-[#e9edff] px-3 py-2 text-sm font-semibold text-[#4f6df5]">
+            <div className="rounded-2xl bg-[var(--brand-soft)] px-3 py-2 text-sm font-semibold text-[#4f6df5]">
               连续 {streakDays} 天
             </div>
           </div>
-          <div className="mt-7 h-3 overflow-hidden rounded-full bg-[#eef0f4]">
+          <div className="mt-7 h-3 overflow-hidden rounded-full bg-[var(--surface-strong)]">
             <div
-              className="h-full rounded-full bg-[#4f6df5] transition-all"
+              className="h-full rounded-full bg-[var(--brand)] transition-all"
               style={{
                 width: `${tasks.length ? (completedCount / tasks.length) * 100 : 0}%`,
               }}
             />
           </div>
-          <p className="mt-5 text-sm leading-6 text-[#737a88]">
+          <p className="mt-5 text-sm leading-6 text-[var(--muted)]">
             每完成一项任务，都会离你的考试目标更近一步。
           </p>
           <div className="mt-5 border-t border-[#eef0f4] pt-4">
-            <div className="mb-2 text-xs text-[#737a88]">最近 14 周打卡</div>
+            <div className="mb-2 text-xs text-[var(--muted)]">最近 14 周打卡</div>
             <div className="grid grid-flow-col grid-rows-7 gap-1">
               {buildHeatmap(checkIns)}
             </div>
@@ -481,7 +520,7 @@ export default function HomePage() {
       <section className="mt-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">今日任务</h2>
-          <span className="text-sm text-[#737a88]">
+          <span className="text-sm text-[var(--muted)]">
             {tasks.length ? "任务来自你的每日计划" : "等待生成计划"}
           </span>
         </div>
@@ -491,30 +530,31 @@ export default function HomePage() {
             {tasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center gap-4 rounded-2xl border border-[#e4e7ed] bg-white p-4"
+                className="flex items-center gap-4 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-4"
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e9edff] text-sm font-semibold text-[#4f6df5]">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--brand-soft)] text-sm font-semibold text-[#4f6df5]">
                   {taskIcons[task.task_type] ?? "学"}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold">
                     {task.title}
                   </span>
-                  <span className="mt-1 block text-xs text-[#737a88]">
+                  <span className="mt-1 block text-xs text-[var(--muted)]">
                     约 {task.estimated_minutes} 分钟
                   </span>
                 </span>
                 {(task.task_type === "vocabulary" ||
-                  task.task_type === "reading") &&
+                  task.task_type === "reading" ||
+                  task.task_type === "translation") &&
                 task.status !== "completed" ? (
                   <Link
                     href={taskStudyHref(task)}
-                    className="rounded-xl bg-[#4f6df5] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#3b5de7]"
+                    className="rounded-xl bg-[var(--brand)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--brand-strong)]"
                   >
                     开始学习
                   </Link>
                 ) : (
-                  <span className="rounded-xl bg-[#f7f8fa] px-3 py-2 text-xs font-medium text-[#737a88]">
+                  <span className="rounded-xl bg-[var(--surface)] px-3 py-2 text-xs font-medium text-[var(--muted)]">
                     {task.status === "completed" ? "已完成" : "待完成"}
                   </span>
                 )}
@@ -522,7 +562,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => handleCompleteTask(task.id)}
-                    className="rounded-xl bg-[#e9edff] px-4 py-2 text-xs font-semibold text-[#4f6df5] transition hover:bg-[#dde4ff]"
+                    className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[#4f6df5] transition hover:bg-[#dde4ff]"
                   >
                     完成
                   </button>
@@ -531,22 +571,22 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-[24px] border border-dashed border-[#d9dde6] bg-white px-6 py-10 text-center">
+          <div className="rounded-[24px] border border-dashed border-[#d9dde6] bg-[var(--card)] px-6 py-10 text-center">
             <div className="text-3xl">📋</div>
             <h3 className="mt-4 text-base font-semibold">今日计划尚未生成</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#737a88]">
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">
               AI 会根据你的考试日期和每日时间，自动安排今天要完成的单词、阅读、翻译等任务。
             </p>
             <button
               type="button"
               disabled={generating}
               onClick={handleGeneratePlan}
-              className="mt-6 rounded-2xl bg-[#4f6df5] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-60"
+              className="mt-6 rounded-2xl bg-[var(--brand)] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-60"
             >
               {generating ? "AI 正在编排今日任务..." : "让 AI 生成今日计划"}
             </button>
             {planError ? (
-              <p className="mx-auto mt-4 max-w-md rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+              <p className="mx-auto mt-4 max-w-md rounded-xl bg-[var(--danger-soft)] px-4 py-3 text-sm text-[var(--danger)]">
                 {planError}
               </p>
             ) : null}
@@ -557,23 +597,68 @@ export default function HomePage() {
       <section className="mt-6">
         <Link
           href="/assessment"
-          className="flex items-center justify-between rounded-2xl border border-[#e4e7ed] bg-white p-5 transition hover:border-[#4f6df5]"
+          className="flex items-center justify-between rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 transition hover:border-[var(--brand)]"
         >
           <span>
             <span className="block text-sm font-semibold">
               {assessment ? "重新测评词汇水平" : "先做 5 分钟水平测评"}
             </span>
-            <span className="mt-1 block text-xs text-[#737a88]">
+            <span className="mt-1 block text-xs text-[var(--muted)]">
               {assessment
                 ? `当前词汇水平：${assessment.level}`
                 : "让 AI 了解你的基础，才能排出真正适合你的任务"}
             </span>
           </span>
-          <span className="rounded-xl bg-[#e9edff] px-4 py-2 text-xs font-semibold text-[#4f6df5]">
+          <span className="rounded-xl bg-[var(--brand-soft)] px-4 py-2 text-xs font-semibold text-[#4f6df5]">
             {assessment ? "重新测评" : "开始"}
           </span>
         </Link>
       </section>
+
+      {showSettings ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5">
+          <div className="w-full max-w-sm rounded-[24px] border border-[var(--line)] bg-[var(--card)] p-7 shadow-[0_20px_60px_rgba(30,35,55,0.18)]">
+            <h3 className="text-lg font-semibold">每日学习预算</h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              调整每天想投入的学习时间，AI 会按这个时长排任务。
+            </p>
+            <div className="mt-5 grid gap-2">
+              {[15, 30, 45, 60].map((minutes) => (
+                <button
+                  key={minutes}
+                  type="button"
+                  onClick={() => setDraftMinutes(minutes)}
+                  className={`flex items-center justify-between rounded-xl border p-3 text-sm transition ${
+                    draftMinutes === minutes
+                      ? "border-[var(--brand)] bg-[var(--brand-soft)] font-semibold text-[#4f6df5]"
+                      : "border-[var(--line)] bg-[var(--card)] text-[var(--muted)]"
+                  }`}
+                >
+                  <span>{minutes} 分钟</span>
+                  {draftMinutes === minutes ? <span>✓</span> : null}
+                </button>
+              ))}
+            </div>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSettings(false)}
+                className="flex-1 rounded-xl border border-[var(--line)] px-4 py-2 text-sm font-medium text-[var(--muted)] transition hover:bg-[var(--surface)]"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                disabled={savingSettings}
+                onClick={saveSettings}
+                className="flex-1 rounded-xl bg-[var(--brand)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--brand-strong)] disabled:opacity-60"
+              >
+                {savingSettings ? "保存中..." : "保存"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

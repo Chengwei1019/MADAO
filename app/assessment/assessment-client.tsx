@@ -77,7 +77,7 @@ export function AssessmentClient() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-sm text-[#737a88]">
+      <main className="flex min-h-screen items-center justify-center text-sm text-[var(--muted)]">
         正在准备测评...
       </main>
     );
@@ -86,13 +86,13 @@ export function AssessmentClient() {
   if (result) {
     return (
       <main className="flex min-h-screen items-center justify-center px-5">
-        <div className="w-full max-w-sm rounded-[28px] border border-[#e4e7ed] bg-white p-8 text-center shadow-[0_20px_60px_rgba(30,35,55,0.08)]">
+        <div className="w-full max-w-sm rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-8 text-center shadow-[0_20px_60px_rgba(30,35,55,0.08)]">
           <div className="text-4xl">📊</div>
           <h1 className="mt-4 text-2xl font-semibold">你的词汇水平：{result.level}</h1>
-          <p className="mt-3 text-[#737a88]">
+          <p className="mt-3 text-[var(--muted)]">
             认识 {result.knownCount} / {result.totalCount} 个词，正确率 {result.score}%
           </p>
-          <div className="mt-6 rounded-2xl bg-[#f7f8fa] px-5 py-4 text-sm leading-6 text-[#737a88]">
+          <div className="mt-6 rounded-2xl bg-[var(--surface)] px-5 py-4 text-sm leading-6 text-[var(--muted)]">
             {result.score >= 70
               ? "基础扎实，后续任务会适当提升难度，把重心放在阅读和听力。"
               : result.score >= 40
@@ -103,7 +103,7 @@ export function AssessmentClient() {
             type="button"
             disabled={saving}
             onClick={() => router.push("/")}
-            className="mt-7 w-full rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white"
+            className="mt-7 w-full rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white"
           >
             {saving ? "保存中..." : "返回工作台"}
           </button>

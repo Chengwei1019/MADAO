@@ -54,18 +54,18 @@ export function ReadingFlow({
         <button
           type="button"
           onClick={onExit}
-          className="text-sm font-medium text-[#737a88] transition hover:text-[#3a3f4b]"
+          className="text-sm font-medium text-[var(--muted)] transition hover:text-[var(--foreground)]"
         >
           ← 返回
         </button>
-        <span className="text-sm text-[#737a88]">
+        <span className="text-sm text-[var(--muted)]">
           已答 {answeredCount} / {total}
         </span>
       </div>
 
-      <article className="rounded-[24px] border border-[#e4e7ed] bg-white p-8 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
+      <article className="rounded-[24px] border border-[var(--line)] bg-[var(--card)] p-8 shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
         <h1 className="text-xl font-semibold tracking-tight">{passage.title}</h1>
-        <div className="mt-5 whitespace-pre-wrap text-[15px] leading-8 text-[#3a3f4b]">
+        <div className="mt-5 whitespace-pre-wrap text-[15px] leading-8 text-[var(--foreground)]">
           {passage.content}
         </div>
       </article>
@@ -76,22 +76,22 @@ export function ReadingFlow({
           {passage.questions.map((question, qi) => (
             <div
               key={question.id}
-              className="rounded-[20px] border border-[#e4e7ed] bg-white p-5"
+              className="rounded-[20px] border border-[var(--line)] bg-[var(--card)] p-5"
             >
-              <div className="text-sm font-semibold text-[#3a3f4b]">
+              <div className="text-sm font-semibold text-[var(--foreground)]">
                 {qi + 1}. {question.question}
               </div>
               <div className="mt-3 grid gap-2">
                 {question.options.map((option, oi) => {
                   const selected = answers[question.id] === oi;
                   const isCorrect = oi === question.correct_index;
-                  let optionStyle = "border-[#e4e7ed] bg-white";
+                  let optionStyle = "border-[var(--line)] bg-[var(--card)]";
                   if (submitted && isCorrect) {
-                    optionStyle = "border-[#22c55e] bg-[#f0fdf4]";
+                    optionStyle = "border-[var(--success)] bg-[var(--success-soft)]";
                   } else if (submitted && selected && !isCorrect) {
-                    optionStyle = "border-[#ef4444] bg-[#fef2f2]";
+                    optionStyle = "border-[var(--danger)] bg-[var(--danger-soft)]";
                   } else if (selected) {
-                    optionStyle = "border-[#4f6df5] bg-[#f4f6ff]";
+                    optionStyle = "border-[var(--brand)] bg-[var(--brand-soft)]";
                   }
                   return (
                     <button
@@ -101,7 +101,7 @@ export function ReadingFlow({
                       disabled={submitted}
                       className={`flex items-center gap-3 rounded-xl border p-3 text-left text-sm transition ${optionStyle}`}
                     >
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#eef0f4] text-xs font-semibold text-[#737a88]">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--surface-strong)] text-xs font-semibold text-[var(--muted)]">
                         {String.fromCharCode(65 + oi)}
                       </span>
                       <span>{option}</span>
@@ -110,7 +110,7 @@ export function ReadingFlow({
                 })}
               </div>
               {submitted ? (
-                <div className="mt-3 rounded-xl bg-[#f7f8fa] px-4 py-3 text-xs leading-6 text-[#737a88]">
+                <div className="mt-3 rounded-xl bg-[var(--surface)] px-4 py-3 text-xs leading-6 text-[var(--muted)]">
                   {question.explanation}
                 </div>
               ) : null}
@@ -124,7 +124,7 @@ export function ReadingFlow({
           type="button"
           disabled={answeredCount < total}
           onClick={submit}
-          className="mt-8 w-full rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-50"
+          className="mt-8 w-full rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5 disabled:opacity-50"
         >
           {answeredCount < total ? `还需回答 ${total - answeredCount} 题` : "提交答案"}
         </button>
@@ -132,7 +132,7 @@ export function ReadingFlow({
         <button
           type="button"
           onClick={onExit}
-          className="mt-8 w-full rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white"
+          className="mt-8 w-full rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white"
         >
           返回今日任务
         </button>

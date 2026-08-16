@@ -5,7 +5,7 @@ export default function VocabularyPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center text-sm text-[#737a88]">
+        <main className="flex min-h-screen items-center justify-center text-sm text-[var(--muted)]">
           正在加载单词...
         </main>
       }

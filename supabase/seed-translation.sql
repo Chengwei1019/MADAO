@@ -1,0 +1,4 @@
+insert into public.translations (source_text, reference_text, difficulty, source, tags) values
+  ('中国有许多传统节日，其中最著名的是春节。人们通常在春节期间与家人团聚，一起吃年夜饭。', 'China has many traditional festivals, the most famous of which is the Spring Festival. During this festival, people usually get together with their families and have a reunion dinner.', 1, 'original', '{cet4,culture}'),
+  ('近年来，越来越多的人开始关注环境保护。政府也采取了一系列措施来减少污染。', 'In recent years, more and more people have begun to pay attention to environmental protection. The government has also taken a series of measures to reduce pollution.', 1, 'original', '{cet4,society}'),
+  ('高铁的普及大大缩短了城市之间的距离，使得人们出行更加方便。', 'The popularity of high-speed rail has greatly shortened the distance between cities, making travel more convenient for people.', 2, 'original', '{cet4,technology}');

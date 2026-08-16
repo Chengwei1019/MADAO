@@ -29,7 +29,7 @@ export function WordCardDeck({
 
   if (!words.length) {
     return (
-      <main className="mx-auto max-w-2xl px-5 py-12 text-center text-[#737a88]">
+      <main className="mx-auto max-w-2xl px-5 py-12 text-center text-[var(--muted)]">
         词库还没有单词，请先在 Supabase 执行 seed 数据。
       </main>
     );
@@ -58,16 +58,16 @@ export function WordCardDeck({
   if (finished) {
     return (
       <main className="flex min-h-screen items-center justify-center px-5">
-        <div className="w-full max-w-sm rounded-[28px] border border-[#e4e7ed] bg-white p-8 text-center shadow-[0_20px_60px_rgba(30,35,55,0.08)]">
+        <div className="w-full max-w-sm rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-8 text-center shadow-[0_20px_60px_rgba(30,35,55,0.08)]">
           <div className="text-4xl">🎉</div>
           <h1 className="mt-4 text-2xl font-semibold">本轮完成</h1>
-          <p className="mt-3 text-[#737a88]">
+          <p className="mt-3 text-[var(--muted)]">
             认识 {known} 个，待巩固 {words.length - known} 个。
           </p>
           <button
             type="button"
             onClick={onExit}
-            className="mt-7 w-full rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white"
+            className="mt-7 w-full rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white"
           >
             返回今日任务
           </button>
@@ -82,39 +82,39 @@ export function WordCardDeck({
         <button
           type="button"
           onClick={onExit}
-          className="text-sm font-medium text-[#737a88] transition hover:text-[#3a3f4b]"
+          className="text-sm font-medium text-[var(--muted)] transition hover:text-[var(--foreground)]"
         >
           ← 返回
         </button>
-        <span className="text-sm text-[#737a88]">
+        <span className="text-sm text-[var(--muted)]">
           {index + 1} / {words.length}
         </span>
       </div>
 
-      <div className="h-2 overflow-hidden rounded-full bg-[#eef0f4]">
+      <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-strong)]">
         <div
-          className="h-full rounded-full bg-[#4f6df5] transition-all"
+          className="h-full rounded-full bg-[var(--brand)] transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <div className="mt-8 flex min-h-[320px] w-full flex-col items-center justify-center rounded-[28px] border border-[#e4e7ed] bg-white p-10 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
+      <div className="mt-8 flex min-h-[320px] w-full flex-col items-center justify-center rounded-[28px] border border-[var(--line)] bg-[var(--card)] p-10 text-center shadow-[0_16px_50px_rgba(30,35,55,0.06)]">
         <div className="text-4xl font-semibold tracking-tight">
           {current.word}
         </div>
-        <div className="mt-2 text-sm text-[#737a88]">{current.phonetic}</div>
+        <div className="mt-2 text-sm text-[var(--muted)]">{current.phonetic}</div>
 
         {revealed ? (
           <div className="mt-8">
-            <div className="text-lg font-medium text-[#3a3f4b]">
+            <div className="text-lg font-medium text-[var(--foreground)]">
               {current.meaning}
             </div>
-            <div className="mt-4 rounded-2xl bg-[#f7f8fa] px-5 py-4 text-left text-sm leading-7 text-[#737a88]">
+            <div className="mt-4 rounded-2xl bg-[var(--surface)] px-5 py-4 text-left text-sm leading-7 text-[var(--muted)]">
               {current.example}
             </div>
           </div>
         ) : (
-          <div className="mt-8 text-sm text-[#b2b8c4]">
+          <div className="mt-8 text-sm text-[var(--text-dim)]">
             先判断认不认识，再看释义
           </div>
         )}
@@ -124,7 +124,7 @@ export function WordCardDeck({
         <button
           type="button"
           onClick={nextCard}
-          className="mt-6 w-full rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
+          className="mt-6 w-full rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
         >
           {index + 1 >= words.length ? "查看结果" : "下一词"}
         </button>
@@ -133,14 +133,14 @@ export function WordCardDeck({
           <button
             type="button"
             onClick={() => revealChoice(false)}
-            className="rounded-2xl border border-[#e4e7ed] bg-white px-5 py-3 text-sm font-semibold text-[#737a88] transition hover:bg-[#f7f8fa]"
+            className="rounded-2xl border border-[var(--line)] bg-[var(--card)] px-5 py-3 text-sm font-semibold text-[var(--muted)] transition hover:bg-[var(--surface)]"
           >
             不认识
           </button>
           <button
             type="button"
             onClick={() => revealChoice(true)}
-            className="rounded-2xl bg-[#4f6df5] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
+            className="rounded-2xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(79,109,245,0.24)] transition hover:-translate-y-0.5"
           >
             认识
           </button>

@@ -1,16 +1,16 @@
 import { Suspense } from "react";
-import { ReadingClient } from "./reading-client";
+import { TranslationClient } from "./translation-client";
 
-export default function ReadingPage() {
+export default function TranslationPage() {
   return (
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center text-sm text-[var(--muted)]">
-          正在加载阅读材料...
+          正在加载翻译材料...
         </main>
       }
     >
-      <ReadingClient />
+      <TranslationClient />
     </Suspense>
   );
 }

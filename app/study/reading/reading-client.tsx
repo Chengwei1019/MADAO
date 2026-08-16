@@ -85,7 +85,7 @@ export function ReadingClient() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-sm text-[#737a88]">
+      <main className="flex min-h-screen items-center justify-center text-sm text-[var(--muted)]">
         正在加载阅读材料...
       </main>
     );
@@ -93,7 +93,7 @@ export function ReadingClient() {
 
   if (!passage) {
     return (
-      <main className="mx-auto max-w-xl px-5 py-12 text-center text-[#737a88]">
+      <main className="mx-auto max-w-xl px-5 py-12 text-center text-[var(--muted)]">
         阅读材料尚未准备，请先在 Supabase 执行 seed 数据。
       </main>
     );
