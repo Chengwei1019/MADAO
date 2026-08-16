@@ -35,6 +35,13 @@ function remainingDays(target: string) {
   return Math.max(0, Math.ceil((end.getTime() - now.getTime()) / 86_400_000));
 }
 
+function localDateString(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 function calculateStreak(checkDates: string[]) {
   const dateSet = new Set(checkDates);
   let streak = 0;
@@ -127,13 +134,24 @@ export default function HomePage() {
         .maybeSingle();
       setAssessment(assessmentData as { level: string; vocabulary_score: number } | null);
 
-      const { data: taskData } = await supabase
-        .from("daily_tasks")
-        .select("id, task_type, title, estimated_minutes, status")
+      const today = localDateString();
+      const { data: todayPlan } = await supabase
+        .from("daily_plans")
+        .select("id")
         .eq("user_id", user.id)
-        .order("order_index")
-        .limit(10);
-      setTasks((taskData ?? []) as DailyTask[]);
+        .eq("plan_date", today)
+        .maybeSingle();
+
+      if (todayPlan) {
+        const { data: taskData } = await supabase
+          .from("daily_tasks")
+          .select("id, task_type, title, estimated_minutes, status")
+          .eq("plan_id", todayPlan.id)
+          .order("order_index");
+        setTasks((taskData ?? []) as DailyTask[]);
+      } else {
+        setTasks([]);
+      }
 
       const since = new Date();
       since.setDate(since.getDate() - 90);
@@ -141,7 +159,7 @@ export default function HomePage() {
         .from("check_ins")
         .select("check_date")
         .eq("user_id", user.id)
-        .gte("check_date", since.toISOString().slice(0, 10));
+        .gte("check_date", localDateString(since));
       setCheckIns(
         (checkInData ?? []).map((row: { check_date: string }) => row.check_date),
       );
@@ -188,8 +206,9 @@ export default function HomePage() {
       }
 
       const supabase = createSupabaseBrowserClient();
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateString();
       let planId = "";
+      let planExists = false;
 
       const { data: planData, error: planInsertError } = await supabase
         .from("daily_plans")
@@ -205,6 +224,7 @@ export default function HomePage() {
 
       if (planInsertError) {
         if (planInsertError.code !== "23505") throw planInsertError;
+        planExists = true;
         const { data: existingPlan } = await supabase
           .from("daily_plans")
           .select("id")
@@ -217,6 +237,10 @@ export default function HomePage() {
       }
 
       if (!planId) throw new Error("Could not create the daily plan.");
+
+      if (planExists) {
+        throw new Error("今天的计划已经生成过了，请先完成今天的任务。");
+      }
 
       const { error: tasksInsertError } = await supabase
         .from("daily_tasks")
@@ -259,7 +283,7 @@ export default function HomePage() {
       return;
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localDateString();
     const { data: existingCheckIn } = await supabase
       .from("check_ins")
       .select("id, completed_count")
